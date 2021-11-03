@@ -1,0 +1,24 @@
+div > img.logo {
+  height: 9em;
+  margin: 0;
+}
+
+table {
+  margin: 0em 2em 2em 2em;
+}
+
+tbody {
+  text-align: center;
+}
+
+td > img.site-icon{
+  height: 1em;
+}
+
+td.stalker{
+  text-align: left;
+}
+
+div.footer{
+  text-align: center;
+}

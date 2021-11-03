@@ -1,5 +1,10 @@
 # Footsteps
 
+How to build an extension using Angular:
+> https://medium.com/angular-in-depth/chrome-extension-with-angular-why-and-how-778200b87575
+
+# Angular
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.11.
 
 ## Development server

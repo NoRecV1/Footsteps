@@ -7,4 +7,5 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'footsteps';
+  stalkers = ['facebook.com', 'instagram.com']
 }
