@@ -9,7 +9,16 @@
     "32": "./assets/icons/favicon-32x32.png",
     "16": "./assets/icons/favicon-16x16.png"
   },
-
+  "permissions": [
+    "webRequest",
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": [
+      "background.js",
+      "runtime.js"
+    ]
+  },
   "browser_action": {
     "default_popup": "index.html"
   }
