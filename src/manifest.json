@@ -10,6 +10,7 @@
     "16": "./assets/icons/favicon-16x16.png"
   },
   "permissions": [
+    "cookies",
     "webRequest",
     "<all_urls>"
   ],
