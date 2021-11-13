@@ -1,14 +1,28 @@
-<div>
-  <img class="logo" src="../assets/img/logo-footsteps-text.png" />
+<div class="header">
+  <img class="logo" src="../assets/img/new_Logo-Footsteps-Horizontal-White-Text.png" />
 </div>
 
-<table>
-  <thead><tr><th colspan="2">These sites are currently watching you</th></tr></thead>
-  <tbody>
-    <tr *ngFor="let stalker of stalkers"><td class="site-icon"><img class="site-icon" src="../assets/img/earth.png" /></td><td class="stalker">{{stalker}}</td></tr>
-  </tbody>
-</table>
+
+<div>
+  <div class="tabs">
+    <a data-ui="#tab1_" class="active">Traces</a>
+    <a data-ui="#tab2_">Aide</a>
+  </div>
+  <div id="tab1_" class="page padding left active">
+    <div class="content">
+      <table>
+        <thead><tr><th colspan="2">These sites are currently watching you</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let stalker of stalkers"><td class="site-icon"><img class="site-icon" src="../assets/img/earth.png" /></td><td class="stalker">{{stalker}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div id="tab2_" class="page padding left">
+    <h5>Help</h5>
+  </div>
+</div>
 
 <div class="footer">
-  <p>© 2021 footsteps.org</p>
+  <p>© 2021 footsteps</p>
 </div>

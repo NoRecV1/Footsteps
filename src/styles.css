@@ -1,1 +1,19 @@
 /* You can add global styles to this file, and also import other style files */
+
+@import "../node_modules/beercss/src/cdn/beer.css";
+
+@font-face {
+  font-family: "Quicksand";
+  src: local("Quicksand"), url(./assets/fonts/Quicksand_Book.otf) format("truetype");
+}
+
+@font-face {
+  font-family: "Adlinnaka";
+  src: local("Adlinnaka"), url(./assets/fonts/Adlinnaka-BoldDemo.ttf) format("truetype");
+}
+
+body {
+  border: none !important;
+  margin: 0px !important;
+  padding: 0 !important;
+}
