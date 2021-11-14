@@ -13,6 +13,7 @@ chrome.tabs.onUpdated.addListener((tabId: number, info: chrome.tabs.TabChangeInf
     console.log(url.hostname);
     CookiesService.getCookies({domain: url.hostname}).then(
       (cookies)=>{
+        // sometimes cookies is empty, it's because sometimes url.hostname begins with www... ex youtube
         console.log(cookies);
       }
     )
