@@ -10,8 +10,10 @@
     "16": "./assets/icons/favicon-16x16.png"
   },
   "permissions": [
+    "storage",
     "webRequest",
-    "<all_urls>"
+    "http://*/*",
+    "https://*/*"
   ],
   "background": {
     "scripts": [

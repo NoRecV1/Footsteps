@@ -5,7 +5,7 @@
 <table>
   <thead><tr><th colspan="2">These sites are currently watching you</th></tr></thead>
   <tbody>
-    <tr *ngFor="let request of ( latestRequestArray$ | async )"><td class="site-icon"><img class="site-icon" src="../assets/img/earth.png" /></td><td class="stalker">Req {{request.requestId}} from {{request.initiator}}</td></tr>
+    <tr *ngFor="let request of tabReqArray"><td class="site-icon"><img class="site-icon" src="../assets/img/earth.png" /></td><td class="stalker">Req {{request.requestId}} from {{request.initiator}}</td></tr>
   </tbody>
 </table>
 
