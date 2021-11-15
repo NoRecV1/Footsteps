@@ -1,7 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
 
-@import "../node_modules/beercss/src/cdn/beer.css";
-
 @font-face {
   font-family: "Quicksand";
   src: local("Quicksand"), url(./assets/fonts/Quicksand_Book.otf) format("truetype");

@@ -31,9 +31,12 @@
               "src/assets"
             ],
             "styles": [
+              "node_modules/beercss/src/cdn/beer.css",
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/beercss/src/cdn/beer.js"
+            ]
           },
           "configurations": {
             "production": {
