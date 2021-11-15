@@ -1,4 +1,4 @@
-const keepAliveTime = 5 * 1000; // time in latest arrays
+const keepAliveTime = 15 * 1000; // time in latest arrays
 
 let request_array: chrome.webRequest.WebRequestBodyDetails[] = [];
 let latest_request_array: chrome.webRequest.WebRequestBodyDetails[] = [];

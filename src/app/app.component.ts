@@ -1,6 +1,6 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ReplaySubject, Observable, Subject, interval, combineLatest, Subscription } from 'rxjs';
-import { distinctUntilChanged, filter, map, pairwise, scan, tap } from 'rxjs/operators';
+import { Component, NgZone, OnInit } from '@angular/core';
+import { ReplaySubject } from 'rxjs';
+import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -9,50 +9,41 @@ import { distinctUntilChanged, filter, map, pairwise, scan, tap } from 'rxjs/ope
 })
 export class AppComponent implements OnInit {
   title = 'footsteps';
-  // stalkers = [ 'facebook.com', 'instagram.com' ]
 
   public tabId!: number;
 
-  // private refresh$ = interval(this.refreshRate);
-  // // private deleteOldestRequest$ = new BehaviorSubject(0);
+  public tabs_latest_request_array$: ReplaySubject<{ [key: number]: chrome.webRequest.WebRequestBodyDetails[] }> = new ReplaySubject();
+  public latestRequests$ = this.tabs_latest_request_array$.pipe(
+    //take only requests from this tab
+    map((tabs_latest_request_array) => tabs_latest_request_array[this.tabId] ?? []),
+    //only emit changes in this tab
+    distinctUntilChanged((previousRequests: chrome.webRequest.WebRequestBodyDetails[], currentRequests: chrome.webRequest.WebRequestBodyDetails[]) => (
+      previousRequests.length === currentRequests.length
+    )),
+  );
 
-  // public allRequest$: Subject<chrome.webRequest.WebRequestBodyDetails> = new ReplaySubject();
-  // public tabRequest$: Observable<chrome.webRequest.WebRequestBodyDetails> = this.allRequest$.pipe(
-  //   filter((details, i) => details.tabId === this.tabId),
-  // );
-  // public latestRequestArray$: Observable<chrome.webRequest.WebRequestBodyDetails[]> = combineLatest(
-  //   [
-  //     this.tabRequest$,
-  //     this.refresh$,
-  //   ]
-  // ).pipe(
-  //   // filter(([_, details]) => details.timeStamp < Date.now() + this.displayTime ),
-  //   // map(([_, details]) => details),
-  //   pairwise(),
-  //   map(([[previousRequest, previousRefresh], [currentRequest, currentRefresh]]) => (
-  //     previousRefresh === currentRefresh ? currentRequest : undefined
-  //   )),
-  //   scan((list: chrome.webRequest.WebRequestBodyDetails[], newRequest): chrome.webRequest.WebRequestBodyDetails[] => {
-  //     return list.filter((requestDetails)=> Date.now() < requestDetails.timeStamp + this.displayTime).concat(newRequest ?? []);
-  //   },[]),
-  //   distinctUntilChanged((prev, curr) => prev.length === curr.length),
-  //   tap(console.log),
-  // );
+  public domainRequestCount$ = this.latestRequests$.pipe(
+    //map list of request to object associating domain (key) to number of requests (value)
+    map((requests) => requests.reduce((acc: {[key: string] : number}, request) => {
+      const initiator = request.initiator ?? '__unknown__';
+      if (initiator === '__unknown__') console.log('Unknown initiator : ', request);
+      return (acc[initiator] = ++acc[initiator] || 1, acc);
+    }, {})),
+  );
 
-  public tabReqArray: chrome.webRequest.WebRequestBodyDetails[] = [];
-
-  constructor (private cRef: ChangeDetectorRef) {}
+  constructor (
+    private ngZone: NgZone,
+  ) {}
 
   public async ngOnInit () {
     this.tabId = (await getTab()).id ?? -1;
+    this.tabs_latest_request_array$.next({});
     chrome.storage.onChanged.addListener((changes, area) => {
+      //get changes on local storages and use if tabs_latest_request_array was updated
       if (area === 'local' && changes.tabs_latest_request_array?.newValue) {
-        const incomingTabReqArray: chrome.webRequest.WebRequestBodyDetails[] = changes.tabs_latest_request_array.newValue[this.tabId];
-        if (this.tabReqArray.length !== incomingTabReqArray.length) {
-          this.tabReqArray = [ ...incomingTabReqArray];
-          this.cRef.detectChanges();
-          console.log('LatestRequests : ', incomingTabReqArray);
-        }
+        this.ngZone.run(() => { //ngZone to run it in angular zone so it sees cahnges
+          this.tabs_latest_request_array$.next(changes.tabs_latest_request_array.newValue);
+        })
       }
     });
   }
