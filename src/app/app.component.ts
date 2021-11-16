@@ -25,9 +25,10 @@ export class AppComponent implements OnInit {
   public domainRequestCount$ = this.latestRequests$.pipe(
     //map list of request to object associating domain (key) to number of requests (value)
     map((requests) => requests.reduce((acc: {[key: string] : number}, request) => {
-      const initiator = request.initiator ?? '__unknown__';
-      if (initiator === '__unknown__') console.log('Unknown initiator : ', request);
-      return (acc[initiator] = ++acc[initiator] || 1, acc);
+      // const initiator = request.initiator ?? '__unknown__';
+      const domain = new URL(request.url).hostname;
+      // if (initiator === '__unknown__') console.log('Unknown initiator : ', request);
+      return (acc[domain] = ++acc[domain] || 1, acc);
     }, {})),
   );
 
