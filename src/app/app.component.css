@@ -7,7 +7,7 @@ div.header, div.footer {
 /* Header */
 div.header {
   text-align: center;
-  height: fit-content;
+  height: fit-tracks;
   padding-right: 10em;
 }
 
@@ -16,14 +16,18 @@ div > img.logo {
   height: 3em;
 }
 
-/* Content */
 div.content {
+  height: 20em;
+}
+
+/* tracks */
+div.tracks {
   font-family: "Adlinnaka";
   font-size: medium;
 }
 
-/* Content : Table */
-div.content > table {
+/* tracks : Table */
+div.tracks > table {
   margin: 0em 2em 2em 2em;
 }
 
