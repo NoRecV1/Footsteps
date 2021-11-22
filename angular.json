@@ -31,11 +31,11 @@
               "src/assets"
             ],
             "styles": [
-              "node_modules/beercss/src/cdn/beer.css",
+              "node_modules/beercss/dist/cdn/beer.min.css",
               "src/styles.css"
             ],
             "scripts": [
-              "node_modules/beercss/src/cdn/beer.js"
+              "node_modules/beercss/dist/cdn/beer.min.js"
             ]
           },
           "configurations": {

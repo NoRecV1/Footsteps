@@ -1,5 +1,5 @@
 import {AfterViewInit, Component } from '@angular/core';
-declare var ui:any;
+declare const ui: any;
 
 @Component({
   selector: 'app-root',
@@ -17,5 +17,3 @@ export class AppComponent implements AfterViewInit{
   title = 'footsteps';
   stalkers = ['facebook.com', 'instagram.com']
 }
-
-
