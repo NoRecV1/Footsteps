@@ -2,6 +2,8 @@ import { AfterViewInit, Component, NgZone, OnInit } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { BadgeService } from 'src/badge.service';
+import { fromUrl, parseDomain, ParseResult, ParseResultType } from 'parse-domain';
+import { toUnicode } from 'punycode';
 declare const ui: any;
 
 @Component({
@@ -12,6 +14,14 @@ declare const ui: any;
 
 export class AppComponent implements AfterViewInit, OnInit {
   title = 'footsteps';
+
+  public methodsToKeep: string[] = [
+    'POST',
+    'PUT',
+    'CONNECT',
+    'TRACE',
+    'PATCH',
+  ];
 
   public tabId!: number;
   public tabHostname?: string;
@@ -24,14 +34,15 @@ export class AppComponent implements AfterViewInit, OnInit {
     distinctUntilChanged((previousRequests: chrome.webRequest.WebRequestBodyDetails[], currentRequests: chrome.webRequest.WebRequestBodyDetails[]) => (
       previousRequests.length === currentRequests.length
     )),
+    map((requestArray) => requestArray.filter((request) => this.methodsToKeep.includes(request.method))),
   );
 
   public domainRequestCount$ = this.latestRequests$.pipe(
     //map list of request to object associating domain (key) to number of requests (value)
     map((requests) => requests.reduce((acc: {[key: string] : number}, request) => {
-      // const initiatorHost = hostnameFromStringURL(request.initiator);
+      // const initiatorHost = domainFromUrl(request.initiator);
       // if (initiatorHost && initiatorHost !== this.tabHostname) //TODO: list domain firing requets when they are not the current tab domain
-      const destDomain = hostnameFromStringURL(request.url) ?? '__error_invalid_url__';
+      const destDomain = domainFromUrl(request.url) ?? '__error_invalid_url__';
       if (destDomain === this.tabHostname) return acc; // ignore request if to domain of the tab
       return (acc[destDomain] = ++acc[destDomain] || 1, acc);
     }, {})),
@@ -51,7 +62,7 @@ export class AppComponent implements AfterViewInit, OnInit {
     const tab = await getTab();
 
     this.tabId = tab.id ?? -1;
-    this.tabHostname = hostnameFromStringURL(tab.url ?? tab.pendingUrl);
+    this.tabHostname = domainFromUrl(tab.url ?? tab.pendingUrl);
     this.tabs_latest_request_array$.next({});
 
     chrome.storage.onChanged.addListener((changes, area) => {
@@ -65,7 +76,7 @@ export class AppComponent implements AfterViewInit, OnInit {
     chrome.tabs.onUpdated.addListener((tabId, infos, tab) => {
       if (tabId !== this.tabId) return;
       this.ngZone.run(() => {
-        this.tabHostname = hostnameFromStringURL(tab.url ?? tab.pendingUrl);
+        this.tabHostname = domainFromUrl(tab.url ?? tab.pendingUrl);
       });
     });
   }
@@ -103,10 +114,14 @@ function getTab (): Promise<chrome.tabs.Tab> {
   })
 }
 
-function hostnameFromStringURL (stringUrl: any): string | undefined {
-  let hostname;
-  try {
-    hostname = new URL(stringUrl).hostname;
-  } catch (_) {}
-  return hostname;
+function domainFromUrl (url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  const parseResult: ParseResult = parseDomain(
+    fromUrl(url),
+  );
+  if (parseResult.type === ParseResultType.Listed) {
+    const { subDomains, domain, topLevelDomains } = parseResult;
+    return toUnicode(`${domain}.${topLevelDomains.join('.')}`);
+  }
+  return undefined;
 }
