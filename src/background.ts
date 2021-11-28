@@ -1,14 +1,18 @@
-const keepAliveTime = 15 * 1000; // time in latest arrays
+let keepAliveTime:number=10;
+chrome.storage.local.set({key: keepAliveTime});
+// time in latest arrays in seconds
 
 let request_array: chrome.webRequest.WebRequestBodyDetails[] = [];
 let latest_request_array: chrome.webRequest.WebRequestBodyDetails[] = [];
 let tabs_latest_request_array: { [key: number]: chrome.webRequest.WebRequestBodyDetails[]} = {};
+
 
 const setupVariables = () => chrome.storage.local.set({
   request_array: [],
   latest_request_array: [],
   tabs_latest_request_array: {},
 });
+
 
 // set up default values
 chrome.windows.onCreated.addListener(setupVariables);
@@ -30,6 +34,10 @@ chrome.webRequest.onBeforeRequest.addListener(
     });
 
     //remove requests from list after keepAliveTime passed
+    chrome.storage.local.get(['key'], function(result:any) {
+      keepAliveTime = (result.key)*1000;
+    });; 
+    console.log(keepAliveTime);
     setTimeout(() => {
       latest_request_array = (latest_request_array ?? []).slice(1);
       tabs_latest_request_array[details.tabId] = (tabs_latest_request_array[details.tabId] ?? []).slice(1);

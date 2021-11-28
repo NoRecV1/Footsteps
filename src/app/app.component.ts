@@ -15,6 +15,7 @@ export class AppComponent implements AfterViewInit, OnInit {
   public tabId!: number;
   public tabHostname?: string;
 
+
   public tabs_latest_request_array$: ReplaySubject<{ [key: number]: chrome.webRequest.WebRequestBodyDetails[] }> = new ReplaySubject();
   public latestRequests$ = this.tabs_latest_request_array$.pipe(
     //take only requests from this tab
@@ -69,6 +70,7 @@ export class AppComponent implements AfterViewInit, OnInit {
 
   public displayPeriod(): void{
     alert("good"); 
+    chrome.storage.local.set({key: 20});
   }
   
 }
