@@ -9,30 +9,13 @@
     <a data-ui="#tab2_">Aide</a>
   </div>
   <div id="tab1_" class="page padding left active">
-    <div class="tracks">
-      <table>
-        <thead><tr><th colspan="2">Ces sites sont en train d'analyser vos traces</th></tr></thead>
-        <tbody>
-          <tr *ngFor="let stalker of (domainRequestCount$ | async) | keyvalue">
-            <td class="site-icon"><img class="site-icon" src="../assets/img/earth.png" /></td>
-            <td class="stalker">{{stalker.key}}</td>
-            <td>{{stalker.value}}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <app-tracks></app-tracks>
   </div>
   <div id="tab2_" class="page padding left">
-    <div class="help">
-          <p>Footsteps vous informe en temps réel des données collectées dans votre navigateur.</p>
-          <a href="https://www.privacytools.io" target="_blank" rel="noopener"><p>Vous souhaitez protéger vos données ?</p></a>
-    </div>
+    <app-help></app-help>
   </div>
   <div id="tab3_" class="page padding left">
-    <br>
-    <h2>Paramètres</h2>
-    Période d'affichage: <input type="number" id="period" name="display period" value={{getKeepAlive()}}>
-    <button type="button" (click)="displayPeriod()">Appliquer</button>
+    <app-params></app-params>
   </div>
 </div>
 

@@ -1,0 +1,26 @@
+/* tracks */
+div.tracks {
+  font-family: "Adlinnaka";
+  font-size: medium;
+}
+
+/* tracks : Table */
+div.tracks > table {
+  margin: 0em 2em 2em 2em;
+}
+
+th {
+  padding: 1em;
+}
+
+tbody {
+  text-align: center;
+}
+
+td > img.site-icon{
+  height: 1em;
+}
+
+td.stalker{
+  text-align: left;
+}

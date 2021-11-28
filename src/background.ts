@@ -35,8 +35,7 @@ chrome.webRequest.onBeforeRequest.addListener(
     //remove requests from list after keepAliveTime passed
     chrome.storage.local.get(['key'], function(result:any) {
       keepAliveTime = (result.key)*1000;
-    });; 
-    console.log(keepAliveTime);
+    });
     setTimeout(() => {
       tabs_latest_request_array[details.tabId] = (tabs_latest_request_array[details.tabId] ?? []).slice(1);
       chrome.storage.local.set({

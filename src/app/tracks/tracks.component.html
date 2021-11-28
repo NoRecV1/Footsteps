@@ -1,0 +1,12 @@
+<div class="tracks">
+  <table>
+    <thead><tr><th colspan="2">Ces sites sont en train d'analyser vos traces</th></tr></thead>
+    <tbody>
+      <tr *ngFor="let stalker of (domainRequestCount$ | async) | keyvalue">
+        <td class="site-icon"><img class="site-icon" src="../assets/img/earth.png" /></td>
+        <td class="stalker">{{stalker.key}}</td>
+        <td>{{stalker.value}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
