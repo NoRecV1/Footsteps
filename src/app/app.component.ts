@@ -14,8 +14,7 @@ export class AppComponent implements AfterViewInit, OnInit {
 
   public tabId!: number;
   public tabHostname?: string;
-
-
+  //public keepAliveTime:number;
   public tabs_latest_request_array$: ReplaySubject<{ [key: number]: chrome.webRequest.WebRequestBodyDetails[] }> = new ReplaySubject();
   public latestRequests$ = this.tabs_latest_request_array$.pipe(
     //take only requests from this tab
@@ -68,9 +67,19 @@ export class AppComponent implements AfterViewInit, OnInit {
     });
   }
 
-  public displayPeriod(): void{
-    alert("good"); 
-    chrome.storage.local.set({key: 20});
+  public displayPeriod(): void{ 
+    var inputValue:number = Number((<HTMLInputElement>document.getElementById("period")).value);
+    chrome.storage.local.set({key: inputValue});
+  }
+  public getKeepAlive(): any{
+    let result={key:10};
+    let res:any;
+    chrome.storage.local.get(['key'], (res)=>{
+        result.key=res.key;
+
+    });
+    console.log(result);
+    return result.key;
   }
   
 }
