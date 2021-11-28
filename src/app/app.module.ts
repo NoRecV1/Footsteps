@@ -5,6 +5,7 @@ import { AppComponent } from './app.component';
 import { HelpComponent } from './help/help.component';
 import { ParamsComponent } from './params/params.component';
 import { TracksComponent } from './tracks/tracks.component';
+import { HistoryComponent } from './history/history.component';
 
 @NgModule({
   declarations: [
@@ -12,6 +13,7 @@ import { TracksComponent } from './tracks/tracks.component';
     HelpComponent,
     TracksComponent,
     ParamsComponent,
+    HistoryComponent,
   ],
   imports: [
     BrowserModule

@@ -6,16 +6,20 @@
 <div class="content">
   <div class="tabs">
     <a data-ui="#tab1_" class="active">Traces</a>
-    <a data-ui="#tab2_">Aide</a>
-    <a data-ui="#tab3_"><i>settings</i></a>
+    <a data-ui="#tab2_">Historique</a>
+    <a data-ui="#tab3_">Aide</a>
+    <a data-ui="#tab4_"><i>settings</i></a>
   </div>
   <div id="tab1_" class="page padding left active">
     <app-tracks></app-tracks>
   </div>
   <div id="tab2_" class="page padding left">
-    <app-help></app-help>
+    <app-history></app-history>
   </div>
   <div id="tab3_" class="page padding left">
+    <app-help></app-help>
+  </div>
+  <div id="tab4_" class="page padding left">
     <app-params></app-params>
   </div>
 </div>
