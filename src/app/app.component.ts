@@ -66,7 +66,13 @@ export class AppComponent implements AfterViewInit, OnInit {
       });
     });
   }
+
+  public displayPeriod(): void{
+    alert("good"); 
+  }
+  
 }
+
 
 function getTab (): Promise<chrome.tabs.Tab> {
   return new Promise((resolve, reject) => {
