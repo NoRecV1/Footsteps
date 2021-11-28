@@ -2,8 +2,9 @@ import { AfterViewInit, Component, NgZone, OnInit } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { BadgeService } from 'src/badge.service';
-import { fromUrl, parseDomain, ParseResult, ParseResultType } from 'parse-domain';
-import { toUnicode } from 'punycode';
+
+import { domainFromUrl, getTab, methodsToKeep } from './utils';
+
 declare const ui: any;
 
 @Component({
@@ -13,16 +14,6 @@ declare const ui: any;
 })
 
 export class AppComponent implements AfterViewInit, OnInit {
-  title = 'footsteps';
-
-  public methodsToKeep: string[] = [
-    'POST',
-    'PUT',
-    'CONNECT',
-    'TRACE',
-    'PATCH',
-  ];
-
   public tabId!: number;
   public tabHostname?: string;
   //public keepAliveTime:number;
@@ -34,7 +25,7 @@ export class AppComponent implements AfterViewInit, OnInit {
     distinctUntilChanged((previousRequests: chrome.webRequest.WebRequestBodyDetails[], currentRequests: chrome.webRequest.WebRequestBodyDetails[]) => (
       previousRequests.length === currentRequests.length
     )),
-    map((requestArray) => requestArray.filter((request) => this.methodsToKeep.includes(request.method))),
+    map((requestArray) => requestArray.filter((request) => methodsToKeep.includes(request.method))),
   );
 
   public domainRequestCount$ = this.latestRequests$.pipe(
@@ -96,32 +87,4 @@ export class AppComponent implements AfterViewInit, OnInit {
     return result.key;
   }
   
-}
-
-
-function getTab (): Promise<chrome.tabs.Tab> {
-  return new Promise((resolve, reject) => {
-    try {
-      chrome.tabs.query(
-        { active: true, currentWindow: true },
-        function (tabs) {
-          resolve(tabs[ 0 ]);
-        }
-      )
-    } catch (e) {
-      reject(e);
-    }
-  })
-}
-
-function domainFromUrl (url: string | undefined): string | undefined {
-  if (!url) return undefined;
-  const parseResult: ParseResult = parseDomain(
-    fromUrl(url),
-  );
-  if (parseResult.type === ParseResultType.Listed) {
-    const { subDomains, domain, topLevelDomains } = parseResult;
-    return toUnicode(`${domain}.${topLevelDomains.join('.')}`);
-  }
-  return undefined;
 }
