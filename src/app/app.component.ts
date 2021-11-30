@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, NgZone, OnInit } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
+import { BadgeService } from 'src/badge.service';
 declare const ui: any;
 
 @Component({
@@ -45,6 +46,8 @@ export class AppComponent implements AfterViewInit, OnInit {
   }
 
   public async ngOnInit () {
+    BadgeService.setUpBadgeNumber(7);
+
     const tab = await getTab();
 
     this.tabId = tab.id ?? -1;
