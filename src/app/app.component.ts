@@ -46,7 +46,7 @@ export class AppComponent implements AfterViewInit, OnInit {
   }
 
   public async ngOnInit () {
-    BadgeService.setUpBadgeNumber(7);
+    BadgeService.setUpBadgeNumber(5);
 
     const tab = await getTab();
 

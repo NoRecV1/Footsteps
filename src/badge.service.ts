@@ -5,16 +5,22 @@ export class BadgeService {
 
 
     public static setUpBadgeBackGroundColor(color: string){
-        chrome.action.setBadgeBackgroundColor({
+        chrome.browserAction.setBadgeBackgroundColor({
             color: color
         })
     }
 
+    public static resetBadgeText(){
+        chrome.browserAction.setBadgeText({
+            text: ""
+        })
+    }
+
     public static setUpBadgeNumber(count: number){
-        count  > this.countThreshold ? chrome.action.setBadgeText({
+        count  > this.countThreshold ? chrome.browserAction.setBadgeText({
             text: "10+"
         }) :
-        chrome.action.setBadgeText({
+        chrome.browserAction.setBadgeText({
             text: count.toString()
         });
 
