@@ -1,5 +1,13 @@
 <div class="params">
-  <h2>Paramètres</h2>
-  Période d'affichage: <input type="number" id="period" name="display period" value={{getKeepAlive()}}>
-  <button type="button" (click)="displayPeriod()">Appliquer</button>
+  <div class="col">
+    <div>Actualisation</div>
+    <label>Temps en secondes avant qu'une information disparaisse</label>
+  </div>
+  <input type="number" id="period" name="display period" value={{getKeepAlive()}}>
+  <button type="button" class="small" (click)="displayPeriod()"><i class="small">done</i></button>
+
+  <div class="toast white-text">
+    <i>info</i>
+    <span>Paramètres enregistrés</span>
+  </div>
 </div>
