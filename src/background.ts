@@ -22,8 +22,6 @@ chrome.tabs.onCreated.addListener((tab) => {
 
 chrome.webRequest.onBeforeRequest.addListener(
   (details: chrome.webRequest.WebRequestBodyDetails) => {
-    console.log(`[at ${Math.round(details?.timeStamp)}] Request sent in tab n°${details?.tabId} from ${details?.initiator} to ${(details?.url.length > 60) ? details?.url.substr(0, 60 - 1) + '…' : details?.url}\n\tBody details :`, details);
-
     request_array = (request_array ?? []).concat(details);
     tabs_latest_request_array[details.tabId] = (tabs_latest_request_array[details.tabId] ?? []).concat(details);
 

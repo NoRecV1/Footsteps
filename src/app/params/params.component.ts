@@ -18,7 +18,6 @@ export class ParamsComponent {
       result.key = res.key;
 
     });
-    console.log(result);
     return result.key;
   }
 }
