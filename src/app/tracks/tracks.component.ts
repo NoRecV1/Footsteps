@@ -42,7 +42,7 @@ export class TracksComponent implements OnInit {
   ) {}
 
   public async ngOnInit () {
-    BadgeService.setUpBadgeNumber(5);
+    // BadgeService.setUpBadgeNumber(5);
 
     const tab = await getTab();
 
