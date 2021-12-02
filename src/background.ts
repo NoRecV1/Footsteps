@@ -1,4 +1,4 @@
-let keepAliveTime:number=10;
+let keepAliveTime:number=30;
 chrome.storage.local.set({key: keepAliveTime});
 // time in latest arrays in seconds
 
