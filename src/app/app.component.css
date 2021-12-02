@@ -1,5 +1,5 @@
 div.header, div.footer {
-  background-color:rgb(68, 106, 187);
+  background-color: #184E77;
   color: white;
   font-family: "Adlinnaka";
 }
@@ -17,7 +17,20 @@ div > img.logo {
 }
 
 div.content {
-  min-height: 20em;
+  min-height: 30em;
+}
+
+/* Content */
+div.tabs {
+  background-color: #168AAD;
+}
+
+div.tabs > a {
+  background-color: #168AAD;
+}
+
+div.tabs > a:hover {
+  background-color: #34A0A4;
 }
 
 /* Footer */
