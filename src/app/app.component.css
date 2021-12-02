@@ -37,4 +37,7 @@ div.tabs > a:hover {
 div.footer{
   padding: .5em;
   text-align: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }
