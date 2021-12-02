@@ -47,6 +47,15 @@ td.stalker{
   text-align: left;
 }
 
+a {
+  color: rgb(68, 106, 187);
+}
+
+a:hover {
+  opacity: 90%;
+  text-decoration: underline;
+}
+
 /* Footer */
 div.footer{
   padding: .5em;
