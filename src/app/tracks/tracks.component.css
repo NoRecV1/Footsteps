@@ -6,11 +6,11 @@ div.tracks {
 
 /* tracks : Table */
 div.tracks > table {
-  margin: 0em 2em 2em 2em;
+  margin: 0em 1em 1em 1em;
 }
 
-th {
-  padding: 1em;
+thead > tr > th {
+  padding: .5em;
 }
 
 tbody {
