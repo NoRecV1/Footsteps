@@ -1,3 +1,5 @@
+import { BadgeService } from "./badge.service";
+
 let keepAliveTime:number=30;
 chrome.storage.local.set({key: keepAliveTime});
 // time in latest arrays in seconds
@@ -25,6 +27,13 @@ chrome.webRequest.onBeforeRequest.addListener(
     request_array = (request_array ?? []).concat(details);
     tabs_latest_request_array[details.tabId] = (tabs_latest_request_array[details.tabId] ?? []).concat(details);
 
+    let n_stalkers = tabs_latest_request_array[details.tabId].length;
+    if(n_stalkers == 0){
+      BadgeService.resetBadgeText();
+    }else{
+      BadgeService.setUpBadgeNumber(n_stalkers);
+    }
+
     chrome.storage.local.set({
       request_array,
       tabs_latest_request_array,
@@ -36,6 +45,13 @@ chrome.webRequest.onBeforeRequest.addListener(
     });
     setTimeout(() => {
       tabs_latest_request_array[details.tabId] = (tabs_latest_request_array[details.tabId] ?? []).slice(1);
+
+      let n_stalkers = tabs_latest_request_array[details.tabId].length;
+      if(n_stalkers == 0){
+        BadgeService.resetBadgeText();
+      }else{
+        BadgeService.setUpBadgeNumber(n_stalkers);
+      }
       chrome.storage.local.set({
         tabs_latest_request_array,
       });
