@@ -1,0 +1,8 @@
+a {
+  color: #184E77;
+}
+
+a:hover {
+  opacity: 90%;
+  text-decoration: underline;
+}

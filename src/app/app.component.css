@@ -1,5 +1,5 @@
 div.header, div.footer {
-  background-color:rgb(68, 106, 187);
+  background-color: #184E77;
   color: white;
   font-family: "Adlinnaka";
 }
@@ -17,38 +17,27 @@ div > img.logo {
 }
 
 div.content {
-  min-height: 20em;
+  min-height: 30em;
 }
 
-/* tracks */
-div.tracks {
-  font-family: "Adlinnaka";
-  font-size: medium;
+/* Content */
+div.tabs {
+  background-color: #76C893;
 }
 
-/* tracks : Table */
-div.tracks > table {
-  margin: 0em 2em 2em 2em;
+div.tabs > a {
+  background-color: #76C893;
 }
 
-th {
-  padding: 1em;
-}
-
-tbody {
-  text-align: center;
-}
-
-td > img.site-icon{
-  height: 1em;
-}
-
-td.stalker{
-  text-align: left;
+div.tabs > a:hover {
+  background-color: #52B69A;
 }
 
 /* Footer */
 div.footer{
   padding: .5em;
   text-align: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }
