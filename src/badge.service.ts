@@ -1,7 +1,7 @@
 export class BadgeService {
 
 
-    static countThreshold: number = 10;
+    static countThreshold: number = 99;
 
 
     public static setUpBadgeBackGroundColor(color: string){
@@ -18,7 +18,7 @@ export class BadgeService {
 
     public static setUpBadgeNumber(count: number){
         count  > this.countThreshold ? chrome.browserAction.setBadgeText({
-            text: "10+"
+            text: "99+"
         }) :
         chrome.browserAction.setBadgeText({
             text: count.toString()
