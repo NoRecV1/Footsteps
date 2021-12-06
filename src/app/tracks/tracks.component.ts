@@ -1,7 +1,6 @@
 import { Component, NgZone, OnInit } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { BadgeService } from 'src/badge.service';
 
 import { domainFromUrl, getTab, methodsToKeep } from '../utils';
 
@@ -42,8 +41,6 @@ export class TracksComponent implements OnInit {
   ) {}
 
   public async ngOnInit () {
-    // BadgeService.setUpBadgeNumber(5);
-
     const tab = await getTab();
 
     this.tabId = tab.id ?? -1;

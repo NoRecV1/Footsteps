@@ -28,11 +28,7 @@ chrome.webRequest.onBeforeRequest.addListener(
     tabs_latest_request_array[details.tabId] = (tabs_latest_request_array[details.tabId] ?? []).concat(details);
 
     let n_stalkers = tabs_latest_request_array[details.tabId].length;
-    if(n_stalkers == 0){
-      BadgeService.resetBadgeText();
-    }else{
-      BadgeService.setUpBadgeNumber(n_stalkers);
-    }
+    BadgeService.setBadgeNumber(n_stalkers, details.tabId);
 
     chrome.storage.local.set({
       request_array,
@@ -47,11 +43,8 @@ chrome.webRequest.onBeforeRequest.addListener(
       tabs_latest_request_array[details.tabId] = (tabs_latest_request_array[details.tabId] ?? []).slice(1);
 
       let n_stalkers = tabs_latest_request_array[details.tabId].length;
-      if(n_stalkers == 0){
-        BadgeService.resetBadgeText();
-      }else{
-        BadgeService.setUpBadgeNumber(n_stalkers);
-      }
+      BadgeService.setBadgeNumber(n_stalkers, details.tabId);
+
       chrome.storage.local.set({
         tabs_latest_request_array,
       });
