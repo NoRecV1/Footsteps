@@ -16,6 +16,8 @@ export class TracksComponent implements OnInit {
   public tabHostname?: string;
 
   public tabs_latest_request_array$: ReplaySubject<{ [key: number]: chrome.webRequest.WebRequestBodyDetails[] }> = new ReplaySubject();
+  private domain_to_data: {[key: string]: string} = {'google.com': 'google data', 'facebook.com': 'facebook data'};
+
   public latestRequests$ = this.tabs_latest_request_array$.pipe(
     //take only requests from this tab
     map((tabs_latest_request_array) => tabs_latest_request_array[this.tabId] ?? []),
@@ -28,13 +30,32 @@ export class TracksComponent implements OnInit {
 
   public domainRequestCount$ = this.latestRequests$.pipe(
     //map list of request to object associating domain (key) to number of requests (value)
-    map((requests) => requests.reduce((acc: {[key: string] : number}, request) => {
+
+    // AON TODO Utiliser un objet pour stocker la data collectée et le nombre de requêtes
+    map((requests) => requests.reduce((acc: {[key: string] : {data: string, count: number}}, request) => {
       // const initiatorHost = domainFromUrl(request.initiator);
       // if (initiatorHost && initiatorHost !== this.tabHostname) //TODO: list domain firing requets when they are not the current tab domain
       const destDomain = domainFromUrl(request.url) ?? '__error_invalid_url__';
       if (destDomain === this.tabHostname) return acc; // ignore request if to domain of the tab
-      return (acc[destDomain] = ++acc[destDomain] || 1, acc);
+
+      // if(this.domain_to_data[destDomain] !== undefined){
+      //console.log(this.domain_to_data[destDomain])
+      //console.log(++(acc[destDomain][1]) || 1)
+      return (acc[destDomain] = {data: this.domain_to_data[destDomain] || '', count: acc[destDomain]?.count ? ++(acc[destDomain].count) : 1}, acc)
+      // }
+      // console.log('Unknown data')
+      // console.log(++acc[destDomain][1])
+      // return (acc[destDomain] = ['', ++acc[destDomain][1] || 1], acc)
     }, {})),
+
+    // map((requests) => requests.reduce((match: {[key: string] : string}, request) =>{
+    //   // AON Modifier par la suite pour considérer des requêtes fines, pas uniquement le domaine global
+    //   const destDomain = domainFromUrl(request.url) ?? '__error_invalid_url__';
+    //   if(this.domain_to_data[destDomain] !== undefined){
+    //     return (match[destDomain] = this.domain_to_data[destDomain], match)
+    //   }
+    //   return 1
+    // }, {})),
   );
 
   constructor (
