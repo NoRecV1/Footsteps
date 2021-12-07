@@ -2,7 +2,7 @@ import { Component, NgZone, OnInit } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
-import { domainFromUrl, getTab } from '../utils';
+import { domainFromUrl, getTab, localStorageGet } from '../utils';
 
 @Component({
   selector: 'app-tracks',
@@ -43,7 +43,9 @@ export class TracksComponent implements OnInit {
 
     this.tabId = tab.id ?? -1;
     this.tabHostname = domainFromUrl(tab.url ?? tab.pendingUrl);
-    this.tabs_latest_request_array$.next({});
+
+    // init observable with current value of local storage
+    this.tabs_latest_request_array$.next((await localStorageGet(['tabs_latest_request_array'])).tabs_latest_request_array ?? {});
 
     chrome.storage.onChanged.addListener((changes, area) => {
       //get changes on local storages and use if tabs_latest_request_array was updated
