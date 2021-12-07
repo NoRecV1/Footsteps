@@ -1,3 +1,4 @@
+import { methodsToKeep } from "./app/utils";
 import { BadgeService } from "./badge.service";
 
 let keepAliveTime:number=30;
@@ -24,6 +25,11 @@ chrome.tabs.onCreated.addListener((tab) => {
 
 chrome.webRequest.onBeforeRequest.addListener(
   (details: chrome.webRequest.WebRequestBodyDetails) => {
+    //remove calls from chrome extension
+    if (details.initiator?.startsWith('chrome-extension://')) return;
+    //keep only some methods
+    if (!methodsToKeep.includes(details.method)) return;
+
     request_array = (request_array ?? []).concat(details);
     tabs_latest_request_array[details.tabId] = (tabs_latest_request_array[details.tabId] ?? []).concat(details);
 
