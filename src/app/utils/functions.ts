@@ -16,6 +16,21 @@ export function getTab (): Promise<chrome.tabs.Tab> {
   })
 }
 
+export function localStorageGet ( keys: string[] ): Promise<{[key: string]: any}> {
+  return new Promise((resolve, reject) => {
+    try {
+      chrome.storage.local.get(
+        keys,
+        function (object) {
+          resolve(object);
+        }
+      )
+    } catch (e) {
+      reject(e);
+    }
+  })
+}
+
 export function domainFromUrl (url: string | undefined): string | undefined {
   if (!url) return undefined;
   const parseResult: ParseResult = parseDomain(

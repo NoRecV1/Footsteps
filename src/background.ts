@@ -1,5 +1,8 @@
+import { methodsToKeep } from "./app/utils";
+import { BadgeService } from "./badge.service";
+
 let keepAliveTime:number=30;
-chrome.storage.local.set({key: keepAliveTime});
+chrome.storage.local.set({keepAliveTime_key: keepAliveTime});
 // time in latest arrays in seconds
 
 let request_array: chrome.webRequest.WebRequestBodyDetails[] = [];
@@ -22,8 +25,16 @@ chrome.tabs.onCreated.addListener((tab) => {
 
 chrome.webRequest.onBeforeRequest.addListener(
   (details: chrome.webRequest.WebRequestBodyDetails) => {
+    //remove calls from chrome extension
+    if (details.initiator?.startsWith('chrome-extension://')) return;
+    //keep only some methods
+    if (!methodsToKeep.includes(details.method)) return;
+
     request_array = (request_array ?? []).concat(details);
     tabs_latest_request_array[details.tabId] = (tabs_latest_request_array[details.tabId] ?? []).concat(details);
+
+    let n_stalkers = tabs_latest_request_array[details.tabId].length;
+    BadgeService.setBadgeNumber(n_stalkers, details.tabId);
 
     chrome.storage.local.set({
       request_array,
@@ -31,15 +42,19 @@ chrome.webRequest.onBeforeRequest.addListener(
     });
 
     //remove requests from list after keepAliveTime passed
-    chrome.storage.local.get(['key'], function(result:any) {
-      keepAliveTime = (result.key)*1000;
+    chrome.storage.local.get(['keepAliveTime_key'], function(result:any) {
+      keepAliveTime = (result.keepAliveTime_key);
     });
     setTimeout(() => {
       tabs_latest_request_array[details.tabId] = (tabs_latest_request_array[details.tabId] ?? []).slice(1);
+
+      let n_stalkers = tabs_latest_request_array[details.tabId].length;
+      BadgeService.setBadgeNumber(n_stalkers, details.tabId);
+
       chrome.storage.local.set({
         tabs_latest_request_array,
       });
-    }, keepAliveTime);
+    }, keepAliveTime * 1000);
   },
   { urls: [ "http://*/*", "https://*/*" ] }
 );

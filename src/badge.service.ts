@@ -1,7 +1,7 @@
 export class BadgeService {
 
 
-    static countThreshold: number = 10;
+    static countThreshold: number = 99;
 
 
     public static setUpBadgeBackGroundColor(color: string){
@@ -16,13 +16,23 @@ export class BadgeService {
         })
     }
 
-    public static setUpBadgeNumber(count: number){
-        count  > this.countThreshold ? chrome.browserAction.setBadgeText({
-            text: "10+"
-        }) :
-        chrome.browserAction.setBadgeText({
-            text: count.toString()
+    private static setBadgeText(details: chrome.browserAction.BadgeTextDetails) {
+        chrome.browserAction.setBadgeText(details, () => {
+            if (chrome.runtime.lastError) return; //tab doesn't exists, avoid error
         });
+    }
 
+    public static setBadgeNumber(count: number, tabId?: number){
+        let text = '';
+        if (count > this.countThreshold) {
+            text = `${this.countThreshold}+`
+        }
+        else if (count > 0) {
+            text = `${count}`;
+        }
+        this.setBadgeText({
+            text,
+            tabId,
+        });
     }
 }

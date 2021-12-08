@@ -12,19 +12,28 @@ export class ParamsComponent {
 
 
 
-
-  public displayPeriod (): void {
+  public keepAliveTime:number=30;
+  public SetKeepAliveTime (): void {
     var inputValue: number = Number((<HTMLInputElement>document.getElementById("period")).value);
-    chrome.storage.local.set({ key: inputValue });
+    chrome.storage.local.set({ keepAliveTime_key: inputValue });
     ui('.toast');
   }
-  public getKeepAlive (): any {
-    let result = { key: 30 };
-    let res: any;
-    chrome.storage.local.get([ 'key' ], (res) => {
-      result.key = res.key;
+  public async ngOnInit () {
+    this.keepAliveTime = await keepAliveTimePromise();
+    //console.log("here"); console.log(this.keep);
 
-    });
-    return result.key;
   }
+
+}
+function keepAliveTimePromise(): Promise<any> {
+  return new Promise((resolve, reject) => {
+    try{
+    chrome.storage.local.get(['keepAliveTime_key'], (result)=>{
+        resolve(result.keepAliveTime_key);
+    });
+  } catch (e) {
+      reject(e);
+    }
+  });
+
 }

@@ -1,9 +1,8 @@
 import { Component, NgZone, OnInit } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { BadgeService } from 'src/badge.service';
 
-import { domainFromUrl, getTab, methodsToKeep } from '../utils';
+import { domainFromUrl, getTab, localStorageGet } from '../utils';
 
 @Component({
   selector: 'app-tracks',
@@ -23,7 +22,6 @@ export class TracksComponent implements OnInit {
     distinctUntilChanged((previousRequests: chrome.webRequest.WebRequestBodyDetails[], currentRequests: chrome.webRequest.WebRequestBodyDetails[]) => (
       previousRequests.length === currentRequests.length
     )),
-    map((requestArray) => requestArray.filter((request) => methodsToKeep.includes(request.method))),
   );
 
   public domainRequestCount$ = this.latestRequests$.pipe(
@@ -32,7 +30,6 @@ export class TracksComponent implements OnInit {
       // const initiatorHost = domainFromUrl(request.initiator);
       // if (initiatorHost && initiatorHost !== this.tabHostname) //TODO: list domain firing requets when they are not the current tab domain
       const destDomain = domainFromUrl(request.url) ?? '__error_invalid_url__';
-      if (destDomain === this.tabHostname) return acc; // ignore request if to domain of the tab
       return (acc[destDomain] = ++acc[destDomain] || 1, acc);
     }, {})),
   );
@@ -42,13 +39,13 @@ export class TracksComponent implements OnInit {
   ) {}
 
   public async ngOnInit () {
-    // BadgeService.setUpBadgeNumber(5);
-
     const tab = await getTab();
 
     this.tabId = tab.id ?? -1;
     this.tabHostname = domainFromUrl(tab.url ?? tab.pendingUrl);
-    this.tabs_latest_request_array$.next({});
+
+    // init observable with current value of local storage
+    this.tabs_latest_request_array$.next((await localStorageGet(['tabs_latest_request_array'])).tabs_latest_request_array ?? {});
 
     chrome.storage.onChanged.addListener((changes, area) => {
       //get changes on local storages and use if tabs_latest_request_array was updated
