@@ -16,7 +16,8 @@ export class TracksComponent implements OnInit {
   public tabHostname?: string;
 
   public tabs_latest_request_array$: ReplaySubject<{ [key: number]: chrome.webRequest.WebRequestBodyDetails[] }> = new ReplaySubject();
-  private domain_to_data: {[key: string]: string} = {'google.com': 'google data', 'facebook.com': 'facebook data'};
+  private domain_to_data: {[key: string]: string} = {'google.com': 'localisation', 'facebook.com': 'tracking publicitaire', 'instagram.com': 'comportement utilisateur',
+      'hubvisor.io': 'tracking publicitaire', 'criteo.com': 'localisation', '4dex.io': 'adresse IP', 'adnxs.com': 'tracking publicitaire', 'adnxs-simple.com': 'tracking publicitaire'};
 
   public latestRequests$ = this.tabs_latest_request_array$.pipe(
     //take only requests from this tab
