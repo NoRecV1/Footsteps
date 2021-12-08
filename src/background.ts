@@ -2,7 +2,7 @@ import { methodsToKeep } from "./app/utils";
 import { BadgeService } from "./badge.service";
 
 let keepAliveTime:number=30;
-chrome.storage.local.set({key: keepAliveTime});
+chrome.storage.local.set({keepAliveTime_key: keepAliveTime});
 // time in latest arrays in seconds
 
 let request_array: chrome.webRequest.WebRequestBodyDetails[] = [];
@@ -42,8 +42,8 @@ chrome.webRequest.onBeforeRequest.addListener(
     });
 
     //remove requests from list after keepAliveTime passed
-    chrome.storage.local.get(['key'], function(result:any) {
-      keepAliveTime = (result.key)*1000;
+    chrome.storage.local.get(['keepAliveTime_key'], function(result:any) {
+      keepAliveTime = (result.keepAliveTime_key);
     });
     setTimeout(() => {
       tabs_latest_request_array[details.tabId] = (tabs_latest_request_array[details.tabId] ?? []).slice(1);
@@ -54,7 +54,7 @@ chrome.webRequest.onBeforeRequest.addListener(
       chrome.storage.local.set({
         tabs_latest_request_array,
       });
-    }, keepAliveTime);
+    }, keepAliveTime * 1000);
   },
   { urls: [ "http://*/*", "https://*/*" ] }
 );
