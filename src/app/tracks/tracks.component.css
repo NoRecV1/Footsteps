@@ -1,5 +1,9 @@
 /* tracks */
-div.tracks {
+div.tracks{
+  text-align: center;
+}
+
+th.colheader {
   font-family: "Adlinnaka";
   font-size: medium;
 }
@@ -10,7 +14,10 @@ div.tracks > table {
 }
 
 thead > tr > th {
-  padding: .5em;
+  text-align: center;
+  font-size: small;
+  margin: 0;
+  padding: 0;
 }
 
 tbody {
