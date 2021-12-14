@@ -2,7 +2,7 @@ import { Component, NgZone, OnInit } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
-import { domainFromUrl, getTab, localStorageGet } from '../utils';
+import { hostFromUrl, domainFromUrl, getTab, localStorageGet } from '../utils';
 
 @Component({
   selector: 'app-tracks',
@@ -15,8 +15,8 @@ export class TracksComponent implements OnInit {
   public tabHostname?: string;
 
   public tabs_latest_request_array$: ReplaySubject<{ [key: number]: chrome.webRequest.WebRequestBodyDetails[] }> = new ReplaySubject();
-  private domain_to_data: {[key: string]: string} = {'google.com': 'localisation', 'facebook.com': 'tracking publicitaire', 'instagram.com': 'comportement utilisateur',
-      'hubvisor.io': 'tracking publicitaire', 'criteo.com': 'localisation', '4dex.io': 'adresse IP', 'adnxs.com': 'tracking publicitaire', 'adnxs-simple.com': 'tracking publicitaire'};
+
+  private uri_to_collected_data: {[key: string]: string} = {'eum-eu-west-1.instana.io': 'Contenu visionné', 'googleadservices.com': 'Suivi publicitaire', 'www.google-analytics.com': 'Contenu visionné', 'graph.instagram.com': 'comportement utilisateur'}
 
   public latestRequests$ = this.tabs_latest_request_array$.pipe(
     //take only requests from this tab
@@ -29,32 +29,44 @@ export class TracksComponent implements OnInit {
 
   public domainRequestCount$ = this.latestRequests$.pipe(
     //map list of request to object associating domain (key) to number of requests (value)
+    map((requests) => requests.reduce((acc: {[key: string] : {data: string[], count: number}}, request) => {
 
-    // AON TODO Utiliser un objet pour stocker la data collectée et le nombre de requêtes
-    map((requests) => requests.reduce((acc: {[key: string] : {data: string, count: number}}, request) => {
       // const initiatorHost = domainFromUrl(request.initiator);
       // if (initiatorHost && initiatorHost !== this.tabHostname) //TODO: list domain firing requets when they are not the current tab domain
-      const destDomain = domainFromUrl(request.url) ?? '__error_invalid_url__';
-      if (destDomain === this.tabHostname) return acc; // ignore request if to domain of the tab
+      let destDomain = domainFromUrl(request.url) ?? '__error_invalid_url__';
+      // if (destDomain === this.tabHostname) return acc; // ignore request if to domain of the tab
 
-      // if(this.domain_to_data[destDomain] !== undefined){
-      //console.log(this.domain_to_data[destDomain])
-      //console.log(++(acc[destDomain][1]) || 1)
-      return (acc[destDomain] = {data: this.domain_to_data[destDomain] || '', count: acc[destDomain]?.count ? ++(acc[destDomain].count) : 1}, acc)
-      // }
-      // console.log('Unknown data')
-      // console.log(++acc[destDomain][1])
-      // return (acc[destDomain] = ['', ++acc[destDomain][1] || 1], acc)
+      // AON TODO : Match alternative domains to main domain. Example below
+      if(destDomain === 'googleadservices.com' || destDomain === 'google-analytics.com'){
+        destDomain = 'google.com'
+      }
+
+
+      // AON Matches the domain to every information it collects
+      // TODO : Improve this trivial behavior (add matches, check if one of the known subdomains is part of the request for instance)
+
+      console.log(request.url);
+      console.log(hostFromUrl(request.url));
+      let collected_by_domain = acc[destDomain]?.data;
+      let match = hostFromUrl(request.url) ?? '__error_invalid_url__'
+      let collected_by_request = this.uri_to_collected_data[match]
+      if(collected_by_domain){
+        if(collected_by_request){
+          if(!collected_by_domain.includes(collected_by_request)){
+            collected_by_domain.push(collected_by_request);
+          }
+        }
+      }else{
+        if(collected_by_request){
+          collected_by_domain = [collected_by_request];
+        }else{
+          collected_by_domain = [];
+        }
+      }
+
+      return (acc[destDomain] = {data: collected_by_domain, count: acc[destDomain]?.count ? ++(acc[destDomain].count) : 1}, acc)
     }, {})),
 
-    // map((requests) => requests.reduce((match: {[key: string] : string}, request) =>{
-    //   // AON Modifier par la suite pour considérer des requêtes fines, pas uniquement le domaine global
-    //   const destDomain = domainFromUrl(request.url) ?? '__error_invalid_url__';
-    //   if(this.domain_to_data[destDomain] !== undefined){
-    //     return (match[destDomain] = this.domain_to_data[destDomain], match)
-    //   }
-    //   return 1
-    // }, {})),
   );
 
   constructor (

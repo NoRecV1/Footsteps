@@ -42,3 +42,15 @@ export function domainFromUrl (url: string | undefined): string | undefined {
   }
   return undefined;
 }
+
+export function hostFromUrl (url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  const parseResult: ParseResult = parseDomain(
+    fromUrl(url),
+  );
+  if (parseResult.type === ParseResultType.Listed) {
+    const { subDomains, domain, topLevelDomains } = parseResult;
+    return toUnicode(`${subDomains.join('.')}.${domain}.${topLevelDomains.join('.')}`);
+  }
+  return undefined;
+}
