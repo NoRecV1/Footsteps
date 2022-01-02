@@ -1,6 +1,6 @@
 import { Component, NgZone, OnInit } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { distinctUntilChanged, map, filter } from 'rxjs/operators';
 
 import { hostFromUrl, domainFromUrl, getTab, localStorageGet } from '../utils';
 
@@ -16,9 +16,14 @@ export class TracksComponent implements OnInit {
 
   public tabs_latest_request_array$: ReplaySubject<{ [key: number]: chrome.webRequest.WebRequestBodyDetails[] }> = new ReplaySubject();
 
-  private uri_to_collected_data: {[key: string]: string} = {'eum-eu-west-1.instana.io': 'Contenu visionné', 'googleadservices.com': 'Suivi publicitaire', 'www.google-analytics.com': 'Contenu visionné', 'graph.instagram.com': 'comportement utilisateur'}
+  private collected_data: {[key: number]: string} = {1: 'Pages consultées', 2: 'Suivi publicitaire', 3: 'Comportement utilisateur',
+    4: 'Localisation'}
 
-  public latestRequests$ = this.tabs_latest_request_array$.pipe(
+  private uri_to_collected_data: {[key: string]: number} = {'eum-eu-west-1.instana.io': 1, 'googleadservices.com': 2,
+    'www.google-analytics.commmm': 1, 'www.google-analytics.com': 2, 'graph.instagram.com': 3, 'stats.g.doubleclick.net': 2,
+    'ariane.abtasty.com': 3, 'ib.adnxs-simple.com': 2}
+
+  private latestRequests$ = this.tabs_latest_request_array$.pipe(
     //take only requests from this tab
     map((tabs_latest_request_array) => tabs_latest_request_array[this.tabId] ?? []),
     //only emit changes in this tab
@@ -28,7 +33,7 @@ export class TracksComponent implements OnInit {
   );
 
   public domainRequestCount$ = this.latestRequests$.pipe(
-    //map list of request to object associating domain (key) to number of requests (value)
+    //map list of request to object associating domain (key) to collected data and number of requests (value)
     map((requests) => requests.reduce((acc: {[key: string] : {data: string[], count: number}}, request) => {
 
       // const initiatorHost = domainFromUrl(request.initiator);
@@ -37,8 +42,8 @@ export class TracksComponent implements OnInit {
       // if (destDomain === this.tabHostname) return acc; // ignore request if to domain of the tab
 
       // AON TODO : Match alternative domains to main domain. Example below
-      if(destDomain === 'googleadservices.com' || destDomain === 'google-analytics.com'){
-        destDomain = 'google.com'
+      if(destDomain === 'googleadservices.com' || destDomain === 'google-analytics.com' || destDomain === 'doubleclick.net'){
+        destDomain = 'google.com';
       }
 
 
@@ -48,8 +53,12 @@ export class TracksComponent implements OnInit {
       console.log(request.url);
       console.log(hostFromUrl(request.url));
       let collected_by_domain = acc[destDomain]?.data;
-      let match = hostFromUrl(request.url) ?? '__error_invalid_url__'
-      let collected_by_request = this.uri_to_collected_data[match]
+      let match = hostFromUrl(request.url) ?? '__error_invalid_url__';
+      let category = this.uri_to_collected_data[match];
+      let collected_by_request = null;
+      if(category)
+        collected_by_request = this.collected_data[category];
+
       if(collected_by_domain){
         if(collected_by_request){
           if(!collected_by_domain.includes(collected_by_request)){
@@ -66,7 +75,22 @@ export class TracksComponent implements OnInit {
 
       return (acc[destDomain] = {data: collected_by_domain, count: acc[destDomain]?.count ? ++(acc[destDomain].count) : 1}, acc)
     }, {})),
+  );
 
+  // AON Only keep those we know are collecting data
+  public stalkers$ = this.domainRequestCount$.pipe(
+    map((domains) => {
+      const filtered = {...domains};
+      for(const domain in domains){
+        if(domains[domain].data.length <= 0){
+          delete filtered[domain];
+        }
+      }
+
+      return filtered;
+    }),
+
+    // filter((domain) => (domain.value?.data?.length > 0))
   );
 
   constructor (
