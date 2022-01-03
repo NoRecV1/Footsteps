@@ -1,4 +1,4 @@
-import { methodsToKeep } from "./app/utils";
+import { methodsToKeep, hostFromUrl, uri_to_collected_data } from "./app/utils";
 import { BadgeService } from "./badge.service";
 
 let keepAliveTime:number=30;
@@ -15,7 +15,6 @@ const setupVariables = () => chrome.storage.local.get(['request_array', 'tabs_la
   });
 });
 
-
 // set up default values
 chrome.windows.onCreated.addListener(setupVariables);
 chrome.runtime.onInstalled.addListener(setupVariables);
@@ -29,6 +28,7 @@ chrome.webRequest.onBeforeRequest.addListener(
     if (details.initiator?.startsWith('chrome-extension://')) return;
     //keep only some methods
     if (!methodsToKeep.includes(details.method)) return;
+    if(!Object.keys(uri_to_collected_data).includes(hostFromUrl(details.url) ?? '')) return;
 
     request_array = (request_array ?? []).concat(details);
     tabs_latest_request_array[details.tabId] = (tabs_latest_request_array[details.tabId] ?? []).concat(details);
