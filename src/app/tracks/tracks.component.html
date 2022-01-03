@@ -1,16 +1,18 @@
 <div class="tracks">
+  <p>Ces sites analysent actuellement vos traces</p>
   <table>
-    <thead><tr><th colspan="3">Ces sites analysent actuellement vos traces</th></tr></thead>
     <tbody>
       <tr>
-        <th></th>
-        <th>Site</th>
-        <th>Traces</th>
+        <th class="colheader"></th>
+        <th class="colheader">Site</th>
+        <th class="colheader">Information</th>
+        <th class="colheader">Traces</th>
       </tr>
-      <tr *ngFor="let stalker of (domainRequestCount$ | async) | keyvalue">
+      <tr *ngFor="let stalker of (stalkers$ | async) | keyvalue">
         <td class="site-icon"><img class="site-icon" src="../assets/img/earth.png" /></td>
         <td class="stalker">{{stalker.key}}</td>
-        <td>{{stalker.value}}</td>
+        <td>{{stalker.value?.data}}</td>
+        <td>{{stalker.value?.count}}</td>
       </tr>
     </tbody>
   </table>
