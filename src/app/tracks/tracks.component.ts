@@ -1,8 +1,8 @@
 import { Component, NgZone, OnInit } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
-import { distinctUntilChanged, map, filter } from 'rxjs/operators';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 
-import { hostFromUrl, domainFromUrl, getTab, localStorageGet } from '../utils';
+import { hostFromUrl, domainFromUrl, getTab, localStorageGet, uri_to_collected_data } from '../utils';
 
 @Component({
   selector: 'app-tracks',
@@ -16,17 +16,9 @@ export class TracksComponent implements OnInit {
 
   public tabs_latest_request_array$: ReplaySubject<{ [key: number]: chrome.webRequest.WebRequestBodyDetails[] }> = new ReplaySubject();
 
-  private collected_data: {[key: number]: string} = {1: 'Pages consultées', 2: 'Suivi publicitaire', 3: 'Comportement utilisateur',
+  private collected_data_naming: {[key: number]: string} = {1: 'Pages consultées', 2: 'Suivi publicitaire', 3: 'Comportement utilisateur',
     4: 'Localisation'}
 
-  private uri_to_collected_data: {[key: string]: number} = {'eum-eu-west-1.instana.io': 1, 'googleadservices.com': 2,
-    'www.google-analytics.commmm': 1, 'www.google-analytics.com': 2, 'graph.instagram.com': 3, 'stats.g.doubleclick.net': 2,
-    'ariane.abtasty.com': 3, 'ib.adnxs-simple.com': 2, 'diff.smartadserver.com': 2, 'prg.smartadserver.com': 2, 'bidder.criteo.com': 2,
-    'csm.nl.eu.criteo.net': 2, '.id5-sync.com': 2, 'www.facebook.com': 3, 'www.linkedin.com': 2, 'c.amazon-adsystem.com': 2, 's.amazon-adsystem.com': 2,
-    'unagi.amazon.com': 3, 'unagi-na.amazon.com': 3, 'gapi.iadvize.com': 2, 'akstat.io': 2, 'beam.hubvisor.io' : 2, 'eur-bid-hubvisor.adsrvr.org': 2,
-    'cache-service.hubvisor.io': 2, 'hbopenbid.pubmatic.com': 2, 'trc.taboola.com': 2, 'search.spotxchange.com': 2, 'ams1-ib.adnxs.com': 2,
-    't.inskinad.com': 2, 'mfad.inskinad.com': 2, 'fra1-ib.adnxs.com': 2, 'pebed.dm-event.net': 2, 'ib.adnxs.com': 2, 'track.adform.net': 2,
-    'intake.pbstck.com': 2}
 
   private latestRequests$ = this.tabs_latest_request_array$.pipe(
     //take only requests from this tab
@@ -63,10 +55,10 @@ export class TracksComponent implements OnInit {
         match = 'akstat.io';
       }
 
-      let category = this.uri_to_collected_data[match];
+      let category = uri_to_collected_data[match];
       let collected_by_request = null;
       if(category)
-        collected_by_request = this.collected_data[category];
+        collected_by_request = this.collected_data_naming[category];
 
       if(collected_by_domain){
         if(collected_by_request){
@@ -98,8 +90,6 @@ export class TracksComponent implements OnInit {
 
       return filtered;
     }),
-
-    // filter((domain) => (domain.value?.data?.length > 0))
   );
 
   constructor (
