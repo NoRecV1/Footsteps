@@ -6,3 +6,13 @@ a:hover {
   opacity: 90%;
   text-decoration: underline;
 }
+
+nav {
+  align-content: center;
+}
+
+.socials {
+  height: auto;
+  width: 48px;
+  margin-top: 1em;
+}

@@ -9,7 +9,7 @@
         <th class="colheader">Traces</th>
       </tr>
       <tr *ngFor="let stalker of (stalkers$ | async) | keyvalue">
-        <td class="site-icon"><img class="site-icon" src="../assets/img/earth.png" /></td>
+        <td class="site-icon"><img class="site-icon" src="../assets/img/www_icon.png" /></td>
         <td class="stalker">{{stalker.key}}</td>
         <td>{{stalker.value?.data}}</td>
         <td>{{stalker.value?.count}}</td>
