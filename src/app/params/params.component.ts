@@ -8,9 +8,8 @@ declare const ui: any;
   styleUrls: [ './params.component.css' ]
 })
 
+// Defines necessary parameters and functions for the settings of the app
 export class ParamsComponent {
-
-
 
   public keepAliveTime:number=30;
   public SetKeepAliveTime (): void {
@@ -20,11 +19,10 @@ export class ParamsComponent {
   }
   public async ngOnInit () {
     this.keepAliveTime = await keepAliveTimePromise();
-    //console.log("here"); console.log(this.keep);
-
   }
 
 }
+
 function keepAliveTimePromise(): Promise<any> {
   return new Promise((resolve, reject) => {
     try{

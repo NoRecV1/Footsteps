@@ -2,7 +2,7 @@ import { Component, NgZone, OnInit } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
-import { hostFromUrl, domainFromUrl, getTab, localStorageGet, uri_to_collected_data } from '../utils';
+import { hostFromUrl, domainFromUrl, getTab, localStorageGet, url_to_collected_data, collected_data_naming } from '../utils';
 
 @Component({
   selector: 'app-tracks',
@@ -11,75 +11,72 @@ import { hostFromUrl, domainFromUrl, getTab, localStorageGet, uri_to_collected_d
 })
 
 export class TracksComponent implements OnInit {
-  public tabId!: number;
-  public tabHostname?: string;
+  public tab_id!: number;
+  public tab_hostname?: string;
 
-  public tabs_latest_request_array$: ReplaySubject<{ [key: number]: chrome.webRequest.WebRequestBodyDetails[] }> = new ReplaySubject();
+  public latest_requests$: ReplaySubject<{ [key: number]: chrome.webRequest.WebRequestBodyDetails[] }> = new ReplaySubject();
 
-  private collected_data_naming: {[key: number]: string} = {1: 'Pages consultées', 2: 'Suivi publicitaire', 3: 'Comportement utilisateur',
-    4: 'Localisation'}
-
-
-  private latestRequests$ = this.tabs_latest_request_array$.pipe(
-    //take only requests from this tab
-    map((tabs_latest_request_array) => tabs_latest_request_array[this.tabId] ?? []),
-    //only emit changes in this tab
-    distinctUntilChanged((previousRequests: chrome.webRequest.WebRequestBodyDetails[], currentRequests: chrome.webRequest.WebRequestBodyDetails[]) => (
-      previousRequests.length === currentRequests.length
+  // AON
+  // Builds the list of stalker domains with number of requests sent and collected data from the raw array
+  // of recent requests collected in the background
+  public stalkers$ = this.latest_requests$.pipe(
+    // Only consider requests from this tab
+    map((requests) => requests[this.tab_id] ?? []),
+    // Only emit when changes occur
+    distinctUntilChanged((previous_requests: chrome.webRequest.WebRequestBodyDetails[], latest_requests: chrome.webRequest.WebRequestBodyDetails[]) => (
+      previous_requests.length === latest_requests.length
     )),
-  );
 
-  public domainRequestCount$ = this.latestRequests$.pipe(
-    //map list of request to object associating domain (key) to collected data and number of requests (value)
+    // Map each domain to the data it collects (data) and the number of requests it emitted (count)
     map((requests) => requests.reduce((acc: {[key: string] : {data: string[], count: number}}, request) => {
 
-      // const initiatorHost = domainFromUrl(request.initiator);
-      // if (initiatorHost && initiatorHost !== this.tabHostname) //TODO: list domain firing requets when they are not the current tab domain
-      let destDomain = domainFromUrl(request.url) ?? '__error_invalid_url__';
-      // if (destDomain === this.tabHostname) return acc; // ignore request if to domain of the tab
+      let dest_domain = domainFromUrl(request.url) ?? '__error_invalid_url__';
 
-      // AON TODO : Match alternative domains to main domain. Example below
-      if(destDomain === 'googleadservices.com' || destDomain === 'google-analytics.com' || destDomain === 'doubleclick.net'){
-        destDomain = 'google.com';
+      // AON
+      // Specific grouping of known domains belonging to google
+      if(dest_domain === 'googleadservices.com' || dest_domain === 'google-analytics.com' || dest_domain === 'doubleclick.net'){
+        dest_domain = 'google.com';
       }
 
-      // AON Matches the domain to every information it collects
-      // TODO : Improve this trivial behavior (add matches, check if one of the known subdomains is part of the request for instance)
-
+      /**
+       * AON Matches the domain to the information it collects
+       */
+      // These two prints allow you to very simply add new entries to url_to_collected_data
       console.log(request.url);
       console.log(hostFromUrl(request.url));
-      let collected_by_domain = acc[destDomain]?.data;
-      let match = hostFromUrl(request.url) ?? '__error_invalid_url__';
 
+      let collected_by_domain = acc[dest_domain]?.data; // Data already collected by the same domain
+      let match = hostFromUrl(request.url) ?? '__error_invalid_url__'; // Url to look for in url_to_collected_data
+
+      // Specific match for all akstat.io domains due to their unique strategy to defeat our matching process
       if(match.includes('akstat.io')){
         match = 'akstat.io';
       }
 
-      let category = uri_to_collected_data[match];
-      let collected_by_request = null;
-      if(category)
-        collected_by_request = this.collected_data_naming[category];
+      let category = url_to_collected_data[match]; // Reference of data collected by this url (if known)
+      let collected_by_request = null; // Will contain the name of the category of data collected by this specific request (location, behavior...)
 
-      if(collected_by_domain){
+      if(category) // Did it match any known url?
+        collected_by_request = collected_data_naming[category];
+
+      if(collected_by_domain){ // Let's add the new entry to the data field for this domain
         if(collected_by_request){
-          if(!collected_by_domain.includes(collected_by_request)){
+          if(!collected_by_domain.includes(collected_by_request)){ // Only one occurence of each category, we don't want duplicates
             collected_by_domain.push(collected_by_request);
           }
         }
-      }else{
+      }else{ // Let's create an array for the data field of this domain
         if(collected_by_request){
           collected_by_domain = [collected_by_request];
         }else{
           collected_by_domain = [];
         }
       }
-
-      return (acc[destDomain] = {data: collected_by_domain, count: acc[destDomain]?.count ? ++(acc[destDomain].count) : 1}, acc)
+      // We now have one more request for this domain and a potential match for collected data
+      return (acc[dest_domain] = {data: collected_by_domain, count: acc[dest_domain]?.count ? ++(acc[dest_domain].count) : 1}, acc)
     }, {})),
-  );
 
-  // AON Only keep those we know are collecting data
-  public stalkers$ = this.domainRequestCount$.pipe(
+    // We only want to keep information about domains we know are collecting data
     map((domains) => {
       const filtered = {...domains};
       for(const domain in domains){
@@ -99,24 +96,24 @@ export class TracksComponent implements OnInit {
   public async ngOnInit () {
     const tab = await getTab();
 
-    this.tabId = tab.id ?? -1;
-    this.tabHostname = domainFromUrl(tab.url ?? tab.pendingUrl);
+    this.tab_id = tab.id ?? -1;
+    this.tab_hostname = domainFromUrl(tab.url ?? tab.pendingUrl);
 
     // init observable with current value of local storage
-    this.tabs_latest_request_array$.next((await localStorageGet(['tabs_latest_request_array'])).tabs_latest_request_array ?? {});
+    this.latest_requests$.next((await localStorageGet(['latest_requests'])).latest_requests ?? {});
 
     chrome.storage.onChanged.addListener((changes, area) => {
-      //get changes on local storages and use if tabs_latest_request_array was updated
-      if (area === 'local' && changes.tabs_latest_request_array?.newValue) {
-        this.ngZone.run(() => { //ngZone to run it in angular zone so it sees cahnges
-          this.tabs_latest_request_array$.next(changes.tabs_latest_request_array.newValue);
+      //get changes on local storage and use if latest_request was updated
+      if (area === 'local' && changes.latest_requests?.newValue) {
+        this.ngZone.run(() => { //ngZone to run it in angular zone so it sees changes
+          this.latest_requests$.next(changes.latest_requests.newValue);
         })
       }
     });
-    chrome.tabs.onUpdated.addListener((tabId, infos, tab) => {
-      if (tabId !== this.tabId) return;
+    chrome.tabs.onUpdated.addListener((tab_id, infos, tab) => {
+      if (tab_id !== this.tab_id) return;
       this.ngZone.run(() => {
-        this.tabHostname = domainFromUrl(tab.url ?? tab.pendingUrl);
+        this.tab_hostname = domainFromUrl(tab.url ?? tab.pendingUrl);
       });
     });
   }

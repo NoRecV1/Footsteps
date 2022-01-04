@@ -1,3 +1,4 @@
+// Any variable that might be needed in several files
 export const methodsToKeep: string[] = [
   'POST',
   'PUT',
@@ -6,7 +7,10 @@ export const methodsToKeep: string[] = [
   'PATCH',
 ];
 
-export const uri_to_collected_data: {[key: string]: number} = {'eum-eu-west-1.instana.io': 1, 'googleadservices.com': 2,
+export const collected_data_naming: {[key: number]: string} = {1: 'Pages consultées', 2: 'Suivi publicitaire', 3: 'Comportement utilisateur',
+    4: 'Localisation'};
+
+export const url_to_collected_data: {[key: string]: number} = {'eum-eu-west-1.instana.io': 1, 'googleadservices.com': 2,
 'www.google-analytics.commmm': 1, 'www.google-analytics.com': 2, 'graph.instagram.com': 3, 'stats.g.doubleclick.net': 2,
 'ariane.abtasty.com': 3, 'ib.adnxs-simple.com': 2, 'diff.smartadserver.com': 2, 'prg.smartadserver.com': 2, 'bidder.criteo.com': 2,
 'csm.nl.eu.criteo.net': 2, '.id5-sync.com': 2, 'www.facebook.com': 3, 'www.linkedin.com': 2, 'c.amazon-adsystem.com': 2, 's.amazon-adsystem.com': 2,
