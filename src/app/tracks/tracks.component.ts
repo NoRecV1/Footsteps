@@ -100,13 +100,13 @@ export class TracksComponent implements OnInit {
     this.tab_hostname = domainFromUrl(tab.url ?? tab.pendingUrl);
 
     // init observable with current value of local storage
-    this.latest_requests$.next((await localStorageGet(['tabs_latest_request_array'])).tabs_latest_request_array ?? {});
+    this.latest_requests$.next((await localStorageGet(['latest_requests'])).latest_requests ?? {});
 
     chrome.storage.onChanged.addListener((changes, area) => {
       //get changes on local storage and use if latest_request was updated
-      if (area === 'local' && changes.tabs_latest_request_array?.newValue) {
+      if (area === 'local' && changes.latest_requests?.newValue) {
         this.ngZone.run(() => { //ngZone to run it in angular zone so it sees changes
-          this.latest_requests$.next(changes.tabs_latest_request_array.newValue);
+          this.latest_requests$.next(changes.latest_requests.newValue);
         })
       }
     });
