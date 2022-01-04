@@ -1,3 +1,4 @@
+// Every function that might be needed in several files
 import { fromUrl, parseDomain, ParseResult, ParseResultType } from 'parse-domain';
 import { toUnicode } from 'punycode';
 

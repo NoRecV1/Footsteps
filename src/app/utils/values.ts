@@ -1,3 +1,4 @@
+// Any variable that might be needed in several files
 export const methodsToKeep: string[] = [
   'POST',
   'PUT',
