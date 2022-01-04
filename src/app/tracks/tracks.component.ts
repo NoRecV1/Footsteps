@@ -14,15 +14,15 @@ export class TracksComponent implements OnInit {
   public tabId!: number;
   public tabHostname?: string;
 
-  public tabs_latest_request_array$: ReplaySubject<{ [key: number]: chrome.webRequest.WebRequestBodyDetails[] }> = new ReplaySubject();
+  public requestsArrayByTabId$: ReplaySubject<{ [key: number]: chrome.webRequest.WebRequestBodyDetails[] }> = new ReplaySubject();
 
   private collected_data_naming: {[key: number]: string} = {1: 'Pages consultées', 2: 'Suivi publicitaire', 3: 'Comportement utilisateur',
     4: 'Localisation'}
 
 
-  private latestRequests$ = this.tabs_latest_request_array$.pipe(
+  private latestRequests$ = this.requestsArrayByTabId$.pipe(
     //take only requests from this tab
-    map((tabs_latest_request_array) => tabs_latest_request_array[this.tabId] ?? []),
+    map((requestsArrayByTabId) => requestsArrayByTabId[this.tabId] ?? []),
     //only emit changes in this tab
     distinctUntilChanged((previousRequests: chrome.webRequest.WebRequestBodyDetails[], currentRequests: chrome.webRequest.WebRequestBodyDetails[]) => (
       previousRequests.length === currentRequests.length
@@ -103,13 +103,13 @@ export class TracksComponent implements OnInit {
     this.tabHostname = domainFromUrl(tab.url ?? tab.pendingUrl);
 
     // init observable with current value of local storage
-    this.tabs_latest_request_array$.next((await localStorageGet(['tabs_latest_request_array'])).tabs_latest_request_array ?? {});
+    this.requestsArrayByTabId$.next((await localStorageGet(['requestsArrayByTabId'])).requestsArrayByTabId ?? {});
 
     chrome.storage.onChanged.addListener((changes, area) => {
-      //get changes on local storages and use if tabs_latest_request_array was updated
-      if (area === 'local' && changes.tabs_latest_request_array?.newValue) {
+      //get changes on local storages and use if requestsArrayByTabId was updated
+      if (area === 'local' && changes.requestsArrayByTabId?.newValue) {
         this.ngZone.run(() => { //ngZone to run it in angular zone so it sees cahnges
-          this.tabs_latest_request_array$.next(changes.tabs_latest_request_array.newValue);
+          this.requestsArrayByTabId$.next(changes.requestsArrayByTabId.newValue);
         })
       }
     });
