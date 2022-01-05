@@ -8,6 +8,12 @@ Footsteps vous indique en temps réel les sites qui récupèrent vos données de
 
 [Vous souhaitez protéger vos données ?](https://www.privacytools.io)
 
+## Installation
+
+* Téléchargez l'extension au format ZIP [ici](https://sourceforge.net/projects/footsteps-extension/)
+* Extrayez le dossier **footsteps_beta** où vous le souhaitez sur votre ordinateur, dans Mes Documents par exemple (veillez à ce qu'il contienne directement les fichiers de l'extension et pas un second dossier **footsteps_beta**)
+* Suivez les instructions à l'étape 2 de [ce guide](https://support.google.com/chrome/a/answer/2714278?hl=fr) pour l'installer facilement sur votre navigateur en quelques clics.
+
 ## Qui sommes-nous?
 Footsteps est développée par une équipe d'étudiants ingénieurs de l'INSA. La protection des données personnelles nous tient à coeur et nous souhaitons offrir plus de transparence à votre expérience de navigation.
 
