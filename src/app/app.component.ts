@@ -10,6 +10,6 @@ declare const ui: any;
 
 export class AppComponent implements AfterViewInit {
   public ngAfterViewInit(): void {
-    ui();
+    ui(); // Initiates BeerCSS framework
   }
 }
